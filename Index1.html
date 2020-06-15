@@ -1,31 +1,90 @@
 <!DOCTYPE html>
-<html lang="ru-ru">
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="style.css">
+ 
+  <title></title>
+    <style>
+      .generate-payment-order {
+        display: flex;
+        width: 300px;
+        flex-direction: column;
+      }
+      .payment-order-data {
+        list-style-type: none;
+      }
+    </style>
+  </head>
+  <body>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Оплата</title>
-    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-</head>
-<div class="container mt-5">
-<div class="row">
-<div class="col-4 offset-4">
- <form method="POST">
-<div class="form-group">
-<label for="amount">Сумма</label>
-<input type="number" class="form-control" id="amount" placeholder="Введите сумму" name="amount">
-</div>
-<div class="form-group">
-<label for="comment">Комментарии</label>
-<input type="text" class="form-control" id="comment" placeholder="комментарии"name="comment">
-</div>
-                <button type="submit" class="btn btn-primary">Пожертвовать</button>
-            </form>
-        </div>
+   <div class="wrapper">
+  <div class="payment">
+ 
+    <h2>Kömek tölegi</h2>
+
+ <form onsubmit="tolegOrder(event, this)" class="generate-payment-order" placeholder="Hola">
+	<div class="form">
+      <div class="summ space icon-relative">
+        <label class="label">Tölegi giriz:</label>
+        <input type="text" class="input" name="amount" placeholder="" ">
+        <i class="fas fa-user"></i>
+      </div>
+      <div class="summ space icon-relative">
+        <label class="label">Düsündiriş:</label>
+        <input type="text" class="input" name="description" placeholder="" >
+       </div>
+        
+      <div class="btn">
+        Tolegi gecir
+      </div> 
+      </form>
     </div>
-
+  </div>
 </div>
 
 
+    <script>
+      async function tolegOrder(event, form) {
+        event.preventDefault();
+        await fetch("http://attest.turkmen-tranzit.com/payment/rest/register.do", {
+           method: "post",
+			 mode: "no-cors",
+	credentials: "include",
+          headers: {
+			"Content-Type": "application/json",
+			"Accept": "application/json"
+			},
+          body: JSON.stringify({
+				orderNumber: "5555465464", 
+		          returnUrl: "local",  
+		     description: form.description,
+				password: "1755",   
+				userName: "client1", 
+		          amount: form.amount.value
+          })
+        })
+          .then(function(response) {
+            return response.json();
+		})
+          .then(function(data) {
+		  //Success code
+            			console.log(`Success ${data.data.orderId}`);
+            			const generatedPaymentOrderData = document.querySelector(
+             				 ".payment-order-data");
+           generatedPaymentOrderData.innerHTML = `
+					<li> <strong>Gecen tolegler:</strong></li>
+					<li>
+					<span class="payment-order-id">OrderId: ${data.data.orderId}</span>
+					</li>
+            `;
+		})
+          .catch(function(errorCode) {
+		console.log(`Error errorCode}`);
+		});
+        }
+    </script>
+  </body>
+</html>
